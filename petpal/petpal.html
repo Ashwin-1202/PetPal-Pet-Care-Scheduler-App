@@ -1,0 +1,1785 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PetPal: Advanced Pet Care Scheduler</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #4a6fa5;
+            --secondary: #6b8cbc;
+            --accent: #ff914d;
+            --light: #f8f9fa;
+            --dark: #343a40;
+            --success: #28a745;
+            --warning: #ffc107;
+            --danger: #dc3545;
+            --gray: #6c757d;
+            --light-gray: #e9ecef;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fa;
+            color: var(--dark);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header Styles */
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 1.5rem 0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo i {
+            font-size: 1.8rem;
+        }
+
+        .logo h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 20px;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 8px 12px;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+
+        nav a:hover, nav a.active {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Main Content Styles */
+        main {
+            padding: 2rem 0;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr 3fr;
+            gap: 20px;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .pet-list h2 {
+            margin-bottom: 15px;
+            color: var(--primary);
+            font-size: 1.3rem;
+        }
+
+        .pet-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .pet-item:hover {
+            background-color: var(--light-gray);
+            transform: translateY(-2px);
+        }
+
+        .pet-item.active {
+            background-color: var(--light-gray);
+            border-left: 4px solid var(--accent);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .pet-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .add-pet-btn {
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
+            justify-content: center;
+            margin-top: 15px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .add-pet-btn:hover {
+            background-color: #e67e22;
+            transform: translateY(-2px);
+        }
+
+        /* Main Content Area */
+        .main-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+        }
+
+        .content-section {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s;
+        }
+
+        .content-section:hover {
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .section-header h2 {
+            color: var(--primary);
+            font-size: 1.3rem;
+        }
+
+        .btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .btn:hover {
+            background-color: var(--secondary);
+            transform: translateY(-2px);
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .stat-card i {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+
+        .stat-card h3 {
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+        }
+
+        .stat-card p {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        /* Schedule Section */
+        .schedule-filters {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .filter-btn {
+            background-color: var(--light-gray);
+            border: none;
+            padding: 6px 12px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+
+        .filter-btn.active {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .schedule-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .schedule-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border-left: 4px solid var(--accent);
+            background-color: var(--light);
+            margin-bottom: 10px;
+            border-radius: 0 8px 8px 0;
+            transition: all 0.3s;
+        }
+
+        .schedule-item:hover {
+            transform: translateX(5px);
+        }
+
+        .schedule-item.completed {
+            opacity: 0.7;
+            background-color: #e8f5e8;
+        }
+
+        .schedule-time {
+            font-weight: bold;
+            min-width: 80px;
+            color: var(--primary);
+        }
+
+        .schedule-details {
+            flex-grow: 1;
+        }
+
+        .schedule-details h4 {
+            margin-bottom: 5px;
+        }
+
+        .schedule-details p {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+
+        .schedule-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .action-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--gray);
+            transition: all 0.3s;
+        }
+
+        .action-btn:hover {
+            color: var(--primary);
+            transform: scale(1.1);
+        }
+
+        /* Health Section */
+        .health-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .health-card {
+            background-color: var(--light);
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid var(--success);
+            transition: all 0.3s;
+        }
+
+        .health-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .health-card.warning {
+            border-left-color: var(--warning);
+        }
+
+        .health-card.danger {
+            border-left-color: var(--danger);
+        }
+
+        .health-card h4 {
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .health-card p {
+            font-size: 0.9rem;
+            color: var(--gray);
+        }
+
+        /* Chart Container */
+        .chart-container {
+            height: 200px;
+            margin-top: 20px;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background-color: white;
+            width: 90%;
+            max-width: 500px;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            animation: slideIn 0.3s;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-header h3 {
+            color: var(--primary);
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--gray);
+            transition: all 0.3s;
+        }
+
+        .close-btn:hover {
+            color: var(--dark);
+            transform: scale(1.1);
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--light-gray);
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(74, 111, 165, 0.2);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn-secondary {
+            background-color: var(--gray);
+        }
+
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid var(--light-gray);
+            margin-bottom: 20px;
+        }
+
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .tab.active {
+            border-bottom: 3px solid var(--primary);
+            color: var(--primary);
+            font-weight: 500;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 30px;
+            color: var(--gray);
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            color: var(--light-gray);
+        }
+
+        /* Notification */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            background: var(--success);
+            color: white;
+            border-radius: 5px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            max-width: 300px;
+            animation: slideInRight 0.3s;
+        }
+
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .notification.error {
+            background: var(--danger);
+        }
+
+        .notification.warning {
+            background: var(--warning);
+        }
+
+        .close-notification {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 0;
+            margin: 0;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 1200px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 992px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+            
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            nav ul {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .health-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-paw"></i>
+                    <h1>PetPal</h1>
+                </div>
+                <nav>
+                    <ul>
+                        <li><a href="#" class="active">Dashboard</a></li>
+                        <li><a href="#">Schedule</a></li>
+                        <li><a href="#">Health</a></li>
+                        <li><a href="#">Medications</a></li>
+                        <li><a href="#">Settings</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container">
+        <div class="dashboard">
+            <!-- Sidebar with Pet List -->
+            <div class="sidebar">
+                <div class="pet-list">
+                    <h2>My Pets</h2>
+                    <div id="petsContainer">
+                        <!-- Pets will be dynamically added here -->
+                    </div>
+                    <button class="add-pet-btn" id="addPetBtn">
+                        <i class="fas fa-plus"></i> Add New Pet
+                    </button>
+                </div>
+
+                <!-- Quick Stats -->
+                <div class="quick-stats" style="margin-top: 30px;">
+                    <h2>Quick Stats</h2>
+                    <div class="stats-grid" style="grid-template-columns: 1fr; margin-top: 15px;">
+                        <div class="stat-card">
+                            <i class="fas fa-tasks"></i>
+                            <h3 id="completedTasks">0</h3>
+                            <p>Completed Today</p>
+                        </div>
+                        <div class="stat-card">
+                            <i class="fas fa-clock"></i>
+                            <h3 id="pendingTasks">0</h3>
+                            <p>Pending Tasks</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content Area -->
+            <div class="main-content">
+                <!-- Schedule Section -->
+                <div class="content-section">
+                    <div class="section-header">
+                        <h2>Today's Schedule</h2>
+                        <button class="btn" id="addReminderBtn">Add Reminder</button>
+                    </div>
+                    
+                    <div class="schedule-filters">
+                        <button class="filter-btn active" data-filter="all">All</button>
+                        <button class="filter-btn" data-filter="food">Food</button>
+                        <button class="filter-btn" data-filter="walk">Walks</button>
+                        <button class="filter-btn" data-filter="vet">Vet</button>
+                        <button class="filter-btn" data-filter="medication">Medication</button>
+                    </div>
+                    
+                    <div class="schedule-list" id="scheduleContainer">
+                        <!-- Schedule items will be dynamically added here -->
+                    </div>
+                </div>
+                
+                <!-- Health & Analytics Section -->
+                <div class="content-section">
+                    <div class="tabs">
+                        <div class="tab active" data-tab="health">Health Overview</div>
+                        <div class="tab" data-tab="analytics">Analytics</div>
+                        <div class="tab" data-tab="medications">Medications</div>
+                    </div>
+                    
+                    <div class="tab-content active" id="health-tab">
+                        <div class="health-grid" id="healthContainer">
+                            <!-- Health cards will be dynamically added here -->
+                        </div>
+                    </div>
+                    
+                    <div class="tab-content" id="analytics-tab">
+                        <div class="section-header">
+                            <h3>Activity Overview</h3>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="activityChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="tab-content" id="medications-tab">
+                        <div class="section-header">
+                            <h3>Medication Schedule</h3>
+                            <button class="btn" id="addMedicationBtn">Add Medication</button>
+                        </div>
+                        <div id="medicationsContainer">
+                            <!-- Medications will be dynamically added here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Add Pet Modal -->
+    <div class="modal" id="addPetModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Add New Pet</h3>
+                <button class="close-btn" id="closePetModal">&times;</button>
+            </div>
+            <form id="petForm">
+                <div class="form-group">
+                    <label for="petName">Pet Name</label>
+                    <input type="text" id="petName" class="form-control" placeholder="Enter pet name" required>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="petType">Pet Type</label>
+                        <select id="petType" class="form-control" required>
+                            <option value="">Select type</option>
+                            <option value="dog">Dog</option>
+                            <option value="cat">Cat</option>
+                            <option value="bird">Bird</option>
+                            <option value="rabbit">Rabbit</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="petBreed">Breed</label>
+                        <input type="text" id="petBreed" class="form-control" placeholder="Enter breed">
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="petAge">Age</label>
+                        <input type="number" id="petAge" class="form-control" placeholder="Enter age">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="petWeight">Weight (lbs)</label>
+                        <input type="number" id="petWeight" class="form-control" placeholder="Enter weight">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="petNotes">Notes</label>
+                    <textarea id="petNotes" class="form-control" rows="3" placeholder="Any special notes about your pet"></textarea>
+                </div>
+                
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" id="cancelPetBtn">Cancel</button>
+                    <button type="submit" class="btn">Save Pet</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Reminder Modal -->
+    <div class="modal" id="addReminderModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Add New Reminder</h3>
+                <button class="close-btn" id="closeReminderModal">&times;</button>
+            </div>
+            <form id="reminderForm">
+                <div class="form-group">
+                    <label for="reminderType">Reminder Type</label>
+                    <select id="reminderType" class="form-control" required>
+                        <option value="">Select type</option>
+                        <option value="food">Food</option>
+                        <option value="walk">Walk</option>
+                        <option value="vet">Vet Visit</option>
+                        <option value="medication">Medication</option>
+                        <option value="grooming">Grooming</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="reminderPet">For Pet</label>
+                    <select id="reminderPet" class="form-control" required>
+                        <!-- Options will be dynamically added -->
+                    </select>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="reminderDate">Date</label>
+                        <input type="date" id="reminderDate" class="form-control" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="reminderTime">Time</label>
+                        <input type="time" id="reminderTime" class="form-control" required>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="reminderNotes">Notes</label>
+                    <textarea id="reminderNotes" class="form-control" rows="3" placeholder="Add details about this reminder"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="reminderRecurring">
+                        <input type="checkbox" id="reminderRecurring"> Recurring Reminder
+                    </label>
+                </div>
+                
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" id="cancelReminderBtn">Cancel</button>
+                    <button type="submit" class="btn">Save Reminder</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Health Record Modal -->
+    <div class="modal" id="addHealthModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Add Health Record</h3>
+                <button class="close-btn" id="closeHealthModal">&times;</button>
+            </div>
+            <form id="healthForm">
+                <div class="form-group">
+                    <label for="healthType">Record Type</label>
+                    <select id="healthType" class="form-control" required>
+                        <option value="">Select type</option>
+                        <option value="vaccination">Vaccination</option>
+                        <option value="medication">Medication</option>
+                        <option value="weight">Weight</option>
+                        <option value="allergy">Allergy</option>
+                        <option value="condition">Health Condition</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="healthPet">For Pet</label>
+                    <select id="healthPet" class="form-control" required>
+                        <!-- Options will be dynamically added -->
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="healthTitle">Title</label>
+                    <input type="text" id="healthTitle" class="form-control" placeholder="Enter title" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="healthDetails">Details</label>
+                    <textarea id="healthDetails" class="form-control" rows="3" placeholder="Add details about this health record"></textarea>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="healthDate">Date</label>
+                        <input type="date" id="healthDate" class="form-control" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="healthStatus">Status</label>
+                        <select id="healthStatus" class="form-control" required>
+                            <option value="normal">Normal</option>
+                            <option value="warning">Warning</option>
+                            <option value="critical">Critical</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" id="cancelHealthBtn">Cancel</button>
+                    <button type="submit" class="btn">Save Record</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Medication Modal -->
+    <div class="modal" id="addMedicationModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Add Medication</h3>
+                <button class="close-btn" id="closeMedicationModal">&times;</button>
+            </div>
+            <form id="medicationForm">
+                <div class="form-group">
+                    <label for="medicationName">Medication Name</label>
+                    <input type="text" id="medicationName" class="form-control" placeholder="Enter medication name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="medicationPet">For Pet</label>
+                    <select id="medicationPet" class="form-control" required>
+                        <!-- Options will be dynamically added -->
+                    </select>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="medicationDosage">Dosage</label>
+                        <input type="text" id="medicationDosage" class="form-control" placeholder="e.g., 10mg" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="medicationFrequency">Frequency</label>
+                        <select id="medicationFrequency" class="form-control" required>
+                            <option value="once">Once Daily</option>
+                            <option value="twice">Twice Daily</option>
+                            <option value="three">Three Times Daily</option>
+                            <option value="weekly">Weekly</option>
+                            <option value="monthly">Monthly</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="medicationStart">Start Date</label>
+                        <input type="date" id="medicationStart" class="form-control" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="medicationEnd">End Date</label>
+                        <input type="date" id="medicationEnd" class="form-control">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="medicationNotes">Notes</label>
+                    <textarea id="medicationNotes" class="form-control" rows="3" placeholder="Any special instructions"></textarea>
+                </div>
+                
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" id="cancelMedicationBtn">Cancel</button>
+                    <button type="submit" class="btn">Save Medication</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Advanced PetPal Application
+        class AdvancedPetPalApp {
+            constructor() {
+                this.pets = this.loadFromStorage('pets') || [
+                    {
+                        id: 1,
+                        name: 'Buddy',
+                        type: 'dog',
+                        breed: 'Golden Retriever',
+                        age: 3,
+                        weight: 65,
+                        notes: 'Loves playing fetch',
+                        avatarColor: '#4a6fa5'
+                    },
+                    {
+                        id: 2,
+                        name: 'Luna',
+                        type: 'cat',
+                        breed: 'Siamese',
+                        age: 2,
+                        weight: 8,
+                        notes: 'Very vocal and affectionate',
+                        avatarColor: '#6b8cbc'
+                    }
+                ];
+                
+                this.reminders = this.loadFromStorage('reminders') || [
+                    {
+                        id: 1,
+                        petId: 1,
+                        type: 'walk',
+                        date: this.formatDate(new Date()),
+                        time: '08:00',
+                        notes: 'Morning walk in the park',
+                        completed: false,
+                        recurring: false
+                    },
+                    {
+                        id: 2,
+                        petId: 1,
+                        type: 'food',
+                        date: this.formatDate(new Date()),
+                        time: '09:30',
+                        notes: 'Breakfast - 2 cups of dry food',
+                        completed: false,
+                        recurring: true
+                    },
+                    {
+                        id: 3,
+                        petId: 1,
+                        type: 'vet',
+                        date: this.formatDate(new Date()),
+                        time: '14:00',
+                        notes: 'Annual checkup at City Vet Clinic',
+                        completed: false,
+                        recurring: false
+                    },
+                    {
+                        id: 4,
+                        petId: 2,
+                        type: 'food',
+                        date: this.formatDate(new Date()),
+                        time: '10:00',
+                        notes: 'Breakfast - wet food',
+                        completed: true,
+                        recurring: true
+                    }
+                ];
+                
+                this.healthRecords = this.loadFromStorage('healthRecords') || [
+                    {
+                        id: 1,
+                        petId: 1,
+                        type: 'vaccination',
+                        title: 'Rabies Vaccine',
+                        details: 'Due in 3 months',
+                        date: this.formatDate(new Date()),
+                        status: 'normal'
+                    },
+                    {
+                        id: 2,
+                        petId: 1,
+                        type: 'medication',
+                        title: 'Heartworm Prevention',
+                        details: 'Running low, need to refill',
+                        date: this.formatDate(new Date()),
+                        status: 'warning'
+                    },
+                    {
+                        id: 3,
+                        petId: 1,
+                        type: 'weight',
+                        title: 'Weight Check',
+                        details: 'Last recorded: 65 lbs (healthy)',
+                        date: this.formatDate(new Date()),
+                        status: 'normal'
+                    },
+                    {
+                        id: 4,
+                        petId: 1,
+                        type: 'allergy',
+                        title: 'Seasonal Allergies',
+                        details: 'Monitor for symptoms during spring',
+                        date: this.formatDate(new Date()),
+                        status: 'critical'
+                    }
+                ];
+                
+                this.medications = this.loadFromStorage('medications') || [
+                    {
+                        id: 1,
+                        petId: 1,
+                        name: 'Heartgard',
+                        dosage: '1 tablet',
+                        frequency: 'monthly',
+                        startDate: this.formatDate(new Date()),
+                        endDate: this.formatDate(new Date(new Date().setMonth(new Date().getMonth() + 6))),
+                        notes: 'Heartworm prevention',
+                        active: true
+                    },
+                    {
+                        id: 2,
+                        petId: 1,
+                        name: 'Apoquel',
+                        dosage: '16mg',
+                        frequency: 'once',
+                        startDate: this.formatDate(new Date()),
+                        endDate: this.formatDate(new Date(new Date().setMonth(new Date().getMonth() + 1))),
+                        notes: 'For allergies',
+                        active: true
+                    }
+                ];
+                
+                this.currentPetId = 1;
+                this.currentFilter = 'all';
+                this.nextId = {
+                    pets: Math.max(...this.pets.map(p => p.id), 0) + 1,
+                    reminders: Math.max(...this.reminders.map(r => r.id), 0) + 1,
+                    healthRecords: Math.max(...this.healthRecords.map(h => h.id), 0) + 1,
+                    medications: Math.max(...this.medications.map(m => m.id), 0) + 1
+                };
+                
+                this.activityChart = null;
+                
+                this.init();
+            }
+            
+            init() {
+                this.bindEvents();
+                this.renderPets();
+                this.renderReminders();
+                this.renderHealthRecords();
+                this.renderMedications();
+                this.updatePetSelectors();
+                this.updateStats();
+                this.initCharts();
+                this.setupTabs();
+            }
+            
+            bindEvents() {
+                // Pet modal events
+                document.getElementById('addPetBtn').addEventListener('click', () => this.toggleModal('addPetModal', true));
+                document.getElementById('closePetModal').addEventListener('click', () => this.toggleModal('addPetModal', false));
+                document.getElementById('cancelPetBtn').addEventListener('click', () => this.toggleModal('addPetModal', false));
+                document.getElementById('petForm').addEventListener('submit', (e) => this.handleAddPet(e));
+                
+                // Reminder modal events
+                document.getElementById('addReminderBtn').addEventListener('click', () => this.toggleModal('addReminderModal', true));
+                document.getElementById('closeReminderModal').addEventListener('click', () => this.toggleModal('addReminderModal', false));
+                document.getElementById('cancelReminderBtn').addEventListener('click', () => this.toggleModal('addReminderModal', false));
+                document.getElementById('reminderForm').addEventListener('submit', (e) => this.handleAddReminder(e));
+                
+                // Health modal events
+                document.getElementById('addHealthBtn').addEventListener('click', () => this.toggleModal('addHealthModal', true));
+                document.getElementById('closeHealthModal').addEventListener('click', () => this.toggleModal('addHealthModal', false));
+                document.getElementById('cancelHealthBtn').addEventListener('click', () => this.toggleModal('addHealthModal', false));
+                document.getElementById('healthForm').addEventListener('submit', (e) => this.handleAddHealthRecord(e));
+                
+                // Medication modal events
+                document.getElementById('addMedicationBtn').addEventListener('click', () => this.toggleModal('addMedicationModal', true));
+                document.getElementById('closeMedicationModal').addEventListener('click', () => this.toggleModal('addMedicationModal', false));
+                document.getElementById('cancelMedicationBtn').addEventListener('click', () => this.toggleModal('addMedicationModal', false));
+                document.getElementById('medicationForm').addEventListener('submit', (e) => this.handleAddMedication(e));
+                
+                // Filter events
+                document.querySelectorAll('.filter-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => this.handleFilterChange(e));
+                });
+                
+                // Close modals when clicking outside
+                window.addEventListener('click', (e) => {
+                    if (e.target.classList.contains('modal')) {
+                        document.querySelectorAll('.modal').forEach(modal => {
+                            modal.classList.remove('active');
+                        });
+                    }
+                });
+                
+                // Set today's date as default for forms
+                const today = this.formatDate(new Date());
+                document.getElementById('reminderDate').value = today;
+                document.getElementById('healthDate').value = today;
+                document.getElementById('medicationStart').value = today;
+            }
+            
+            setupTabs() {
+                document.querySelectorAll('.tab').forEach(tab => {
+                    tab.addEventListener('click', () => {
+                        const tabId = tab.getAttribute('data-tab');
+                        
+                        // Update active tab
+                        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                        tab.classList.add('active');
+                        
+                        // Show active tab content
+                        document.querySelectorAll('.tab-content').forEach(content => {
+                            content.classList.remove('active');
+                        });
+                        document.getElementById(`${tabId}-tab`).classList.add('active');
+                        
+                        // Initialize chart if analytics tab is selected
+                        if (tabId === 'analytics') {
+                            this.initCharts();
+                        }
+                    });
+                });
+            }
+            
+            toggleModal(modalId, show) {
+                document.getElementById(modalId).classList.toggle('active', show);
+            }
+            
+            handleAddPet(e) {
+                e.preventDefault();
+                const formData = new FormData(e.target);
+                
+                const colors = ['#4a6fa5', '#6b8cbc', '#ff914d', '#28a745', '#dc3545', '#ffc107'];
+                const randomColor = colors[Math.floor(Math.random() * colors.length)];
+                
+                const newPet = {
+                    id: this.nextId.pets++,
+                    name: document.getElementById('petName').value,
+                    type: document.getElementById('petType').value,
+                    breed: document.getElementById('petBreed').value,
+                    age: parseInt(document.getElementById('petAge').value) || 0,
+                    weight: parseInt(document.getElementById('petWeight').value) || 0,
+                    notes: document.getElementById('petNotes').value,
+                    avatarColor: randomColor
+                };
+                
+                this.pets.push(newPet);
+                this.saveToStorage('pets', this.pets);
+                this.renderPets();
+                this.updatePetSelectors();
+                this.toggleModal('addPetModal', false);
+                e.target.reset();
+                
+                // Show success message
+                this.showNotification('Pet added successfully!', 'success');
+            }
+            
+            handleAddReminder(e) {
+                e.preventDefault();
+                
+                const newReminder = {
+                    id: this.nextId.reminders++,
+                    petId: parseInt(document.getElementById('reminderPet').value),
+                    type: document.getElementById('reminderType').value,
+                    date: document.getElementById('reminderDate').value,
+                    time: document.getElementById('reminderTime').value,
+                    notes: document.getElementById('reminderNotes').value,
+                    completed: false,
+                    recurring: document.getElementById('reminderRecurring').checked
+                };
+                
+                this.reminders.push(newReminder);
+                this.saveToStorage('reminders', this.reminders);
+                this.renderReminders();
+                this.updateStats();
+                this.toggleModal('addReminderModal', false);
+                e.target.reset();
+                
+                // Reset date to today and uncheck recurring
+                document.getElementById('reminderDate').value = this.formatDate(new Date());
+                document.getElementById('reminderRecurring').checked = false;
+                
+                // Show success message
+                this.showNotification('Reminder added successfully!', 'success');
+            }
+            
+            handleAddHealthRecord(e) {
+                e.preventDefault();
+                
+                const newHealthRecord = {
+                    id: this.nextId.healthRecords++,
+                    petId: parseInt(document.getElementById('healthPet').value),
+                    type: document.getElementById('healthType').value,
+                    title: document.getElementById('healthTitle').value,
+                    details: document.getElementById('healthDetails').value,
+                    date: document.getElementById('healthDate').value,
+                    status: document.getElementById('healthStatus').value
+                };
+                
+                this.healthRecords.push(newHealthRecord);
+                this.saveToStorage('healthRecords', this.healthRecords);
+                this.renderHealthRecords();
+                this.toggleModal('addHealthModal', false);
+                e.target.reset();
+                
+                // Reset date to today
+                document.getElementById('healthDate').value = this.formatDate(new Date());
+                
+                // Show success message
+                this.showNotification('Health record added successfully!', 'success');
+            }
+            
+            handleAddMedication(e) {
+                e.preventDefault();
+                
+                const newMedication = {
+                    id: this.nextId.medications++,
+                    petId: parseInt(document.getElementById('medicationPet').value),
+                    name: document.getElementById('medicationName').value,
+                    dosage: document.getElementById('medicationDosage').value,
+                    frequency: document.getElementById('medicationFrequency').value,
+                    startDate: document.getElementById('medicationStart').value,
+                    endDate: document.getElementById('medicationEnd').value,
+                    notes: document.getElementById('medicationNotes').value,
+                    active: true
+                };
+                
+                this.medications.push(newMedication);
+                this.saveToStorage('medications', this.medications);
+                this.renderMedications();
+                this.toggleModal('addMedicationModal', false);
+                e.target.reset();
+                
+                // Reset date to today
+                document.getElementById('medicationStart').value = this.formatDate(new Date());
+                
+                // Show success message
+                this.showNotification('Medication added successfully!', 'success');
+            }
+            
+            handleFilterChange(e) {
+                document.querySelectorAll('.filter-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                
+                e.target.classList.add('active');
+                this.currentFilter = e.target.dataset.filter;
+                this.renderReminders();
+            }
+            
+            handlePetSelection(petId) {
+                this.currentPetId = petId;
+                document.querySelectorAll('.pet-item').forEach(item => {
+                    item.classList.remove('active');
+                });
+                document.querySelector(`[data-pet-id="${petId}"]`).classList.add('active');
+                this.renderReminders();
+                this.renderHealthRecords();
+                this.renderMedications();
+                this.updateStats();
+                this.initCharts();
+            }
+            
+            toggleReminderCompletion(reminderId) {
+                const reminder = this.reminders.find(r => r.id === reminderId);
+                if (reminder) {
+                    reminder.completed = !reminder.completed;
+                    this.saveToStorage('reminders', this.reminders);
+                    this.renderReminders();
+                    this.updateStats();
+                    
+                    // Show notification
+                    const action = reminder.completed ? 'completed' : 'marked as pending';
+                    this.showNotification(`Reminder ${action}!`, 'success');
+                }
+            }
+            
+            deleteReminder(reminderId) {
+                if (confirm('Are you sure you want to delete this reminder?')) {
+                    this.reminders = this.reminders.filter(r => r.id !== reminderId);
+                    this.saveToStorage('reminders', this.reminders);
+                    this.renderReminders();
+                    this.updateStats();
+                    this.showNotification('Reminder deleted successfully!', 'success');
+                }
+            }
+            
+            deleteHealthRecord(recordId) {
+                if (confirm('Are you sure you want to delete this health record?')) {
+                    this.healthRecords = this.healthRecords.filter(h => h.id !== recordId);
+                    this.saveToStorage('healthRecords', this.healthRecords);
+                    this.renderHealthRecords();
+                    this.showNotification('Health record deleted successfully!', 'success');
+                }
+            }
+            
+            toggleMedicationStatus(medicationId) {
+                const medication = this.medications.find(m => m.id === medicationId);
+                if (medication) {
+                    medication.active = !medication.active;
+                    this.saveToStorage('medications', this.medications);
+                    this.renderMedications();
+                    
+                    const action = medication.active ? 'activated' : 'deactivated';
+                    this.showNotification(`Medication ${action}!`, 'success');
+                }
+            }
+            
+            deleteMedication(medicationId) {
+                if (confirm('Are you sure you want to delete this medication?')) {
+                    this.medications = this.medications.filter(m => m.id !== medicationId);
+                    this.saveToStorage('medications', this.medications);
+                    this.renderMedications();
+                    this.showNotification('Medication deleted successfully!', 'success');
+                }
+            }
+            
+            renderPets() {
+                const container = document.getElementById('petsContainer');
+                
+                if (this.pets.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-paw"></i>
+                            <p>No pets added yet</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                container.innerHTML = this.pets.map(pet => `
+                    <div class="pet-item ${pet.id === this.currentPetId ? 'active' : ''}" data-pet-id="${pet.id}">
+                        <div class="pet-avatar" style="background-color: ${pet.avatarColor}">${pet.name.charAt(0)}</div>
+                        <div class="pet-info">
+                            <h4>${pet.name}</h4>
+                            <p>${pet.breed || 'Unknown breed'}</p>
+                        </div>
+                    </div>
+                `).join('');
+                
+                // Add event listeners to pet items
+                document.querySelectorAll('.pet-item').forEach(item => {
+                    item.addEventListener('click', () => {
+                        const petId = parseInt(item.dataset.petId);
+                        this.handlePetSelection(petId);
+                    });
+                });
+            }
+            
+            renderReminders() {
+                const container = document.getElementById('scheduleContainer');
+                const today = this.formatDate(new Date());
+                
+                // Filter reminders for today and current pet
+                let filteredReminders = this.reminders.filter(r => 
+                    r.date === today && 
+                    r.petId === this.currentPetId &&
+                    (this.currentFilter === 'all' || r.type === this.currentFilter)
+                );
+                
+                // Sort by time
+                filteredReminders.sort((a, b) => a.time.localeCompare(b.time));
+                
+                if (filteredReminders.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <i class="far fa-calendar-check"></i>
+                            <p>No reminders for today</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                container.innerHTML = filteredReminders.map(reminder => {
+                    const pet = this.pets.find(p => p.id === reminder.petId);
+                    const typeIcons = {
+                        food: 'fa-utensils',
+                        walk: 'fa-walking',
+                        vet: 'fa-stethoscope',
+                        medication: 'fa-pills',
+                        grooming: 'fa-bath',
+                        other: 'fa-bell'
+                    };
+                    
+                    return `
+                        <div class="schedule-item ${reminder.completed ? 'completed' : ''}">
+                            <div class="schedule-time">${this.formatTime(reminder.time)}</div>
+                            <div class="schedule-details">
+                                <h4><i class="fas ${typeIcons[reminder.type] || 'fa-bell'}"></i> ${reminder.type.charAt(0).toUpperCase() + reminder.type.slice(1)}</h4>
+                                <p>${reminder.notes} - ${pet.name}</p>
+                                ${reminder.recurring ? '<small><i class="fas fa-redo"></i> Recurring</small>' : ''}
+                            </div>
+                            <div class="schedule-actions">
+                                <button class="action-btn complete-btn" data-reminder-id="${reminder.id}">
+                                    <i class="fas ${reminder.completed ? 'fa-undo' : 'fa-check'}"></i>
+                                </button>
+                                <button class="action-btn delete-btn" data-reminder-id="${reminder.id}">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+                
+                // Add event listeners to action buttons
+                document.querySelectorAll('.complete-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const reminderId = parseInt(e.currentTarget.dataset.reminderId);
+                        this.toggleReminderCompletion(reminderId);
+                    });
+                });
+                
+                document.querySelectorAll('.delete-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const reminderId = parseInt(e.currentTarget.dataset.reminderId);
+                        this.deleteReminder(reminderId);
+                    });
+                });
+            }
+            
+            renderHealthRecords() {
+                const container = document.getElementById('healthContainer');
+                
+                // Filter health records for current pet
+                const filteredRecords = this.healthRecords.filter(h => h.petId === this.currentPetId);
+                
+                if (filteredRecords.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-heartbeat"></i>
+                            <p>No health records yet</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                container.innerHTML = filteredRecords.map(record => {
+                    const statusClasses = {
+                        normal: '',
+                        warning: 'warning',
+                        critical: 'danger'
+                    };
+                    
+                    const statusIcons = {
+                        normal: 'fa-check-circle',
+                        warning: 'fa-exclamation-triangle',
+                        critical: 'fa-exclamation-circle'
+                    };
+                    
+                    return `
+                        <div class="health-card ${statusClasses[record.status]}">
+                            <h4><i class="fas ${statusIcons[record.status]}"></i> ${record.title}</h4>
+                            <p>${record.details}</p>
+                            <small>${this.formatDisplayDate(record.date)}</small>
+                            <div class="schedule-actions" style="margin-top: 10px;">
+                                <button class="action-btn delete-health-btn" data-record-id="${record.id}">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+                
+                // Add event listeners to delete buttons
+                document.querySelectorAll('.delete-health-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const recordId = parseInt(e.currentTarget.dataset.recordId);
+                        this.deleteHealthRecord(recordId);
+                    });
+                });
+            }
+            
+            renderMedications() {
+                const container = document.getElementById('medicationsContainer');
+                
+                // Filter medications for current pet
+                const filteredMeds = this.medications.filter(m => m.petId === this.currentPetId);
+                
+                if (filteredMeds.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-pills"></i>
+                            <p>No medications yet</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                container.innerHTML = filteredMeds.map(med => {
+                    const frequencyText = {
+                        once: 'Once Daily',
+                        twice: 'Twice Daily',
+                        three: 'Three Times Daily',
+                        weekly: 'Weekly',
+                        monthly: 'Monthly'
+                    };
+                    
+                    return `
+                        <div class="schedule-item">
+                            <div class="schedule-details">
+                                <h4><i class="fas fa-pills"></i> ${med.name}</h4>
+                                <p>${med.dosage} - ${frequencyText[med.frequency]}</p>
+                                <small>Start: ${this.formatDisplayDate(med.startDate)} | End: ${med.endDate ? this.formatDisplayDate(med.endDate) : 'Ongoing'}</small>
+                                <p>${med.notes}</p>
+                            </div>
+                            <div class="schedule-actions">
+                                <button class="action-btn toggle-med-btn" data-medication-id="${med.id}">
+                                    <i class="fas ${med.active ? 'fa-pause' : 'fa-play'}"></i>
+                                </button>
+                                <button class="action-btn delete-med-btn" data-medication-id="${med.id}">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+                
+                // Add event listeners to medication buttons
+                document.querySelectorAll('.toggle-med-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const medicationId = parseInt(e.currentTarget.dataset.medicationId);
+                        this.toggleMedicationStatus(medicationId);
+                    });
+                });
+                
+                document.querySelectorAll('.delete-med-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const medicationId = parseInt(e.currentTarget.dataset.medicationId);
+                        this.deleteMedication(medicationId);
+                    });
+                });
+            }
+            
+            updatePetSelectors() {
+                const petSelectors = [
+                    document.getElementById('reminderPet'),
+                    document.getElementById('healthPet'),
+                    document.getElementById('medicationPet')
+                ];
+                
+                petSelectors.forEach(selector => {
+                    if (selector) {
+                        selector.innerHTML = this.pets.map(pet => `
+                            <option value="${pet.id}">${pet.name}</option>
+                        `).join('');
+                    }
+                });
+            }
+            
+            updateStats() {
+                const today = this.formatDate(new Date());
+                const todayReminders = this.reminders.filter(r => 
+                    r.date === today && r.petId === this.currentPetId
+                );
+                
+                const completed = todayReminders.filter(r => r.completed).length;
+                const pending = todayReminders.filter(r => !r.completed).length;
+                
+                document.getElementById('completedTasks').textContent = completed;
+                document.getElementById('pendingTasks').textContent = pending;
+            }
+            
+            initCharts() {
+                const ctx = document.getElementById('activityChart').getContext('2d');
+                
+                // Destroy existing chart if it exists
+                if (this.activityChart) {
+                    this.activityChart.destroy();
+                }
+                
+                // Generate sample data for the chart
+                const last7Days = [...Array(7)].map((_, i) => {
+                    const d = new Date();
+                    d.setDate(d.getDate() - i);
+                    return this.formatDate(d);
+                }).reverse();
+                
+                const completedData = last7Days.map(date => {
+                    return this.reminders.filter(r => 
+                        r.date === date && r.petId === this.currentPetId && r.completed
+                    ).length;
+                });
+                
+                const pendingData = last7Days.map(date => {
+                    return this.reminders.filter(r => 
+                        r.date === date && r.petId === this.currentPetId && !r.completed
+                    ).length;
+                });
+                
+                // Format dates for display
+                const displayDates = last7Days.map(date => {
+                    const d = new Date(date);
+                    return `${d.getMonth()+1}/${d.getDate()}`;
+                });
+                
+                this.activityChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: displayDates,
+                        datasets: [
+                            {
+                                label: 'Completed',
+                                data: completedData,
+                                backgroundColor: '#28a745',
+                                borderColor: '#28a745',
+                                borderWidth: 1
+                            },
+                            {
+                                label: 'Pending',
+                                data: pendingData,
+                                backgroundColor: '#ffc107',
+                                borderColor: '#ffc107',
+                                borderWidth: 1
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    stepSize: 1
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                            },
+                            title: {
+                                display: true,
+                                text: 'Pet Activity (Last 7 Days)'
+                            }
+                        }
+                    }
+                });
+            }
+            
+            formatDate(date) {
+                return date.toISOString().split('T')[0];
+            }
+            
+            formatDisplayDate(dateString) {
+                const options = { year: 'numeric', month: 'short', day: 'numeric' };
+                return new Date(dateString).toLocaleDateString(undefined, options);
+            }
+            
+            formatTime(timeString) {
+                const [hours, minutes] = timeString.split(':');
+                const hour = parseInt(hours);
+                const ampm = hour >= 12 ? 'PM' : 'AM';
+                const displayHour = hour % 12 || 12;
+                return `${displayHour}:${minutes} ${ampm}`;
+            }
+            
+            showNotification(message, type) {
+                // Create notification element
+                const notification = document.createElement('div');
+                notification.className = `notification ${type === 'error' ? 'error' : type === 'warning' ? 'warning' : ''}`;
+                notification.innerHTML = `
+                    <span>${message}</span>
+                    <button class="close-notification">&times;</button>
+                `;
+                
+                // Add to page
+                document.body.appendChild(notification);
+                
+                // Add event listener to close button
+                const closeBtn = notification.querySelector('.close-notification');
+                closeBtn.addEventListener('click', () => {
+                    notification.remove();
+                });
+                
+                // Auto remove after 5 seconds
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.remove();
+                    }
+                }, 5000);
+            }
+            
+            loadFromStorage(key) {
+                try {
+                    return JSON.parse(localStorage.getItem(`petpal_${key}`));
+                } catch (e) {
+                    console.error('Error loading from storage:', e);
+                    return null;
+                }
+            }
+            
+            saveToStorage(key, data) {
+                try {
+                    localStorage.setItem(`petpal_${key}`, JSON.stringify(data));
+                } catch (e) {
+                    console.error('Error saving to storage:', e);
+                }
+            }
+        }
+
+        // Initialize the app when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            window.petPalApp = new AdvancedPetPalApp();
+        });
+    </script>
+</body>
+</html>
