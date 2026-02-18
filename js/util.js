@@ -1,13 +1,11 @@
-// Utility functions for PetPal app
 
-// Check if user is logged in
 function isLoggedIn() {
     const user = localStorage.getItem('currentUser');
     console.log('isLoggedIn check:', user ? 'User exists' : 'No user');
     return user !== null && user !== 'null' && user !== 'undefined';
 }
 
-// Get current user
+
 function getCurrentUser() {
     try {
         const user = localStorage.getItem('currentUser');
@@ -22,7 +20,7 @@ function getCurrentUser() {
     }
 }
 
-// Get user's pets
+
 function getUserPets() {
     const currentUser = getCurrentUser();
     if (!currentUser) return [];
@@ -31,12 +29,12 @@ function getUserPets() {
     return pets.filter(pet => pet.userId === currentUser.id);
 }
 
-// Save pets to localStorage
+
 function savePets(pets) {
     localStorage.setItem('pets', JSON.stringify(pets));
 }
 
-// Get user's schedules
+
 function getUserSchedules() {
     const currentUser = getCurrentUser();
     if (!currentUser) return [];
@@ -45,12 +43,12 @@ function getUserSchedules() {
     return schedules.filter(schedule => schedule.userId === currentUser.id);
 }
 
-// Save schedules to localStorage
+
 function saveSchedules(schedules) {
     localStorage.setItem('schedules', JSON.stringify(schedules));
 }
 
-// Get user's health records
+
 function getUserHealthRecords() {
     const currentUser = getCurrentUser();
     if (!currentUser) return [];
@@ -59,18 +57,18 @@ function getUserHealthRecords() {
     return healthRecords.filter(record => record.userId === currentUser.id);
 }
 
-// Save health records to localStorage
+
 function saveHealthRecords(healthRecords) {
     localStorage.setItem('healthRecords', JSON.stringify(healthRecords));
 }
 
-// Format date for display
+
 function formatDate(dateString) {
     const options = { year: 'numeric', month: 'short', day: 'numeric' };
     return new Date(dateString).toLocaleDateString(undefined, options);
 }
 
-// Format time for display
+
 function formatTime(timeString) {
     if (!timeString) return '';
     const [hours, minutes] = timeString.split(':');
@@ -80,7 +78,7 @@ function formatTime(timeString) {
     return `${displayHour}:${minutes} ${ampm}`;
 }
 
-// Get color for activity type
+
 function getActivityColor(type) {
     const colors = {
         'feeding': 'linear-gradient(90deg, #FF9A9E, #FAD0C4)',
@@ -95,7 +93,7 @@ function getActivityColor(type) {
     return colors[type] || colors['other'];
 }
 
-// Get icon for activity type
+
 function getActivityIcon(type) {
     const icons = {
         'feeding': 'fa-utensils',
@@ -108,9 +106,8 @@ function getActivityIcon(type) {
     return icons[type] || icons['other'];
 }
 
-// Show notification
+
 function showNotification(message, type = 'success') {
-    // Remove any existing notifications first
     const existingNotifications = document.querySelectorAll('.notification');
     existingNotifications.forEach(notification => {
         if (notification.parentNode) {
@@ -118,7 +115,7 @@ function showNotification(message, type = 'success') {
         }
     });
 
-    // Create notification element
+    
     const notification = document.createElement('div');
     notification.className = `notification ${type}`;
     notification.innerHTML = `
@@ -126,10 +123,10 @@ function showNotification(message, type = 'success') {
         <button class="notification-close">&times;</button>
     `;
     
-    // Add to page
+    
     document.body.appendChild(notification);
     
-    // Auto remove after 5 seconds
+    
     setTimeout(() => {
         if (notification.parentNode) {
             notification.style.animation = 'slideOut 0.3s ease';
@@ -141,7 +138,7 @@ function showNotification(message, type = 'success') {
         }
     }, 5000);
     
-    // Close button functionality
+    
     const closeBtn = notification.querySelector('.notification-close');
     closeBtn.addEventListener('click', () => {
         if (notification.parentNode) {
@@ -150,7 +147,7 @@ function showNotification(message, type = 'success') {
     });
 }
 
-// Update authentication UI based on login status
+
 function updateAuthUI() {
     const authLink = document.getElementById('auth-link');
     console.log('updateAuthUI called, authLink found:', !!authLink);
@@ -181,7 +178,7 @@ function updateAuthUI() {
     }
 }
 
-// Handle user logout
+
 function handleLogout(e) {
     if (e) e.preventDefault();
     
@@ -198,7 +195,7 @@ function handleLogout(e) {
     }, 500);
 }
 
-// Make functions globally available
+
 window.isLoggedIn = isLoggedIn;
 window.getCurrentUser = getCurrentUser;
 window.getUserPets = getUserPets;
@@ -215,7 +212,7 @@ window.showNotification = showNotification;
 window.updateAuthUI = updateAuthUI;
 window.handleLogout = handleLogout;
 
-// Add slideOut animation if not already defined
+
 if (!document.querySelector('#notification-animations')) {
     const style = document.createElement('style');
     style.id = 'notification-animations';
@@ -228,8 +225,9 @@ if (!document.querySelector('#notification-animations')) {
     document.head.appendChild(style);
 }
 
-// Initialize auth when page loads
+
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Utils initialized');
     updateAuthUI();
 });
+
